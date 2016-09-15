@@ -20,6 +20,8 @@
 
 
 std::string calib = "";
+std::string vignetteFile = "";
+std::string gammaFile = "";
 
 using namespace dso;
 
@@ -70,6 +72,19 @@ void parseArgument(char* arg)
 		printf("loading calibration from %s!\n", calib.c_str());
 		return;
 	}
+	if(1==sscanf(arg,"vignette=%s",buf))
+	{
+		vignetteFile = buf;
+		printf("loading vignette from %s!\n", vignetteFile.c_str());
+		return;
+	}
+
+	if(1==sscanf(arg,"gamma=%s",buf))
+	{
+		gammaFile = buf;
+		printf("loading gammaCalib from %s!\n", gammaFile.c_str());
+		return;
+	}
 
 	printf("could not parse argument \"%s\"!!\n", arg);
 }
@@ -87,14 +102,12 @@ void vidCb(const sensor_msgs::ImageConstPtr img)
 	assert(cv_ptr->image.type() == CV_8U);
 	assert(cv_ptr->image.channels() == 1);
 
-	printf("Image Callback!\n");
-
 
 	if(setting_fullResetRequested)
 	{
 		IOWrap::Output3DWrapper* wrap = fullSystem->outputWrapper;
 		delete fullSystem;
-		wrap->reset();
+		if(wrap != 0) wrap->reset();
 		fullSystem = new FullSystem();
 		fullSystem->linearizeOperation=false;
 		fullSystem->outputWrapper = wrap;
@@ -141,13 +154,12 @@ int main( int argc, char** argv )
 
 
 
-    undistorter = Undistort::getUndistorterForFile(calib.c_str());
+    undistorter = Undistort::getUndistorterForFile(calib, gammaFile, vignetteFile);
 
     setGlobalCalib(
             (int)undistorter->getSize()[0],
             (int)undistorter->getSize()[1],
-            undistorter->getK().cast<float>(),
-            undistorter->getK().cast<float>(), 0);
+            undistorter->getK().cast<float>());
 
 
 
