@@ -51,3 +51,9 @@ In that case, the vignette image will not be read, and no photometric calibratio
 You can also implement your own version of ImageRW.h / ImageDisplay.h, instead of the dummies.
 
 
+### 5 License
+This ROS wrapper around DSO is licensed under the GNU General Public License
+Version 3 (GPLv3).
+For commercial purposes, we also offer a professional version, see
+[http://vision.in.tum.de/dso](http://vision.in.tum.de/dso) for
+details.
