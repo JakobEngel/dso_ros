@@ -15,6 +15,9 @@ rosbuild_init()
 set(EXECUTABLE_OUTPUT_PATH bin)
 
 
+set(DSO_PATH $ENV{DSO_PATH})
+message("\n\n---- LOOKING FOR DSO at\n\"${DSO_PATH}\"")
+
 
 find_package(Pangolin 0.2 REQUIRED)
 message("\n\n---- FOUND Pangolin Headers at\n\"${Pangolin_INCLUDE_DIRS}\"")
@@ -26,7 +29,7 @@ message("---- FOUND OpenCV Libs at\n\"${OpenCV_LIBS}\"")
 
 find_package(Eigen3 REQUIRED)
 find_package(Boost COMPONENTS system thread) 
-find_library(DSO_LIBRARY dso /home/engelj/workspace/dso_beta/build/lib)
+find_library(DSO_LIBRARY dso ${DSO_PATH}/build/lib)
 
 # SSE flags
 rosbuild_check_for_sse()
@@ -40,8 +43,8 @@ set(SOURCE_FILES
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/src
-  /home/engelj/workspace/dso_beta/src
-  /home/engelj/workspace/dso_beta/thirdparty/Sophus
+  ${DSO_PATH}/src
+  ${DSO_PATH}/thirdparty/Sophus
   ${Pangolin_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}
 )  

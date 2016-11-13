@@ -3,6 +3,11 @@
 For more information see
 [https://vision.in.tum.de/dso](https://vision.in.tum.de/dso)
 
+This is meant as simple, minimal example of how to integrate DSO from a different project, and run it on real-time input data.
+It does not provide a full ROS interface (no reconfigure / pointcloud output / pose output).
+To access computed information in real-time, I recommend to implement your own Output3DWrapper; see the DSO code.
+
+
 ### Related Papers
 
 * **Direct Sparse Odometry**, *J. Engel, V. Koltun, D. Cremers*, In arXiv:1607.02565, 2016
@@ -10,14 +15,16 @@ For more information see
 * **A Photometrically Calibrated Benchmark For Monocular Visual Odometry**, *J. Engel, V. Usenko, D. Cremers*, In arXiv:1607.02555, 2016
 
 
+
 # 1. Installation
 
 1. Install DSO. We need DSO to be compiled with OpenCV (to read the vignette image), and with Pangolin (for 3D visualization).
-2. adjust three absolute paths in CMakeLists.txt to point to your DSO.
-3. run 
+2. run 
 
+		export DSO_PATH=[PATH_TO_DSO]/dso
 		rosmake
 	
+
 
 # 3 Usage
 everything as described in the DSO project - only this is for real-time camera input.
@@ -27,8 +34,6 @@ everything as described in the DSO project - only this is for real-time camera i
 			calib=XXXXX/camera.txt \
 			gamma=XXXXX/pcalib.txt \
 			vignette=XXXXX/vignette.png \
-
-Feel free to take it as example to set up your own camera input.
 
 
 
@@ -42,8 +47,7 @@ removing
 	    		 (int)undistorter->getSize()[1]);
 
 will allow you to use DSO compiled without Pangolin. However, then there is no 3D visualization.
-You can also implement your own Output3DWrapper.
-
+You can also implement your own Output3DWrapper to fit your needs.
 
 ## 4.2 OpenCV
 you can use DSO compiled without OpenCV. 
@@ -55,5 +59,4 @@ You can also implement your own version of ImageRW.h / ImageDisplay.h, instead o
 This ROS wrapper around DSO is licensed under the GNU General Public License
 Version 3 (GPLv3).
 For commercial purposes, we also offer a professional version, see
-[http://vision.in.tum.de/dso](http://vision.in.tum.de/dso) for
-details.
+[http://vision.in.tum.de/dso](http://vision.in.tum.de/dso) for details.
