@@ -45,6 +45,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/src
   ${DSO_PATH}/src
   ${DSO_PATH}/thirdparty/Sophus
+  ${OpenCV_INCLUDE_DIRS}
   ${Pangolin_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}
 )  
