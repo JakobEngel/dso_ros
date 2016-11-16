@@ -36,6 +36,11 @@ everything as described in the DSO project - only this is for real-time camera i
 			vignette=XXXXX/vignette.png \
 
 
+## 3.1 Accessing Data.
+see the DSO Readme. As of now, there is no default ROS-based `Output3DWrapper` - you will have to write your own.
+
+
+
 
 # 4 Dependencies
 
