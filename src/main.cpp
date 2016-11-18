@@ -35,6 +35,7 @@
 #include "FullSystem/FullSystem.h"
 #include "util/Undistort.h"
 #include "IOWrapper/Pangolin/PangolinDSOViewer.h"
+#include "IOWrapper/OutputWrapper/SampleOutputWrapper.h"
 
 
 #include <ros/ros.h>
@@ -48,6 +49,7 @@
 std::string calib = "";
 std::string vignetteFile = "";
 std::string gammaFile = "";
+bool useSampleOutput=false;
 
 using namespace dso;
 
@@ -55,6 +57,26 @@ void parseArgument(char* arg)
 {
 	int option;
 	char buf[1000];
+
+	if(1==sscanf(arg,"sampleoutput=%d",&option))
+	{
+		if(option==1)
+		{
+			useSampleOutput = true;
+			printf("USING SAMPLE OUTPUT WRAPPER!\n");
+		}
+		return;
+	}
+
+	if(1==sscanf(arg,"quiet=%d",&option))
+	{
+		if(option==1)
+		{
+			setting_debugout_runquiet = true;
+			printf("QUIET MODE, I'll shut up!\n");
+		}
+		return;
+	}
 
 
 	if(1==sscanf(arg,"option=%d",&option))
@@ -131,12 +153,12 @@ void vidCb(const sensor_msgs::ImageConstPtr img)
 
 	if(setting_fullResetRequested)
 	{
-		IOWrap::Output3DWrapper* wrap = fullSystem->outputWrapper;
+		std::vector<IOWrap::Output3DWrapper*> wraps = fullSystem->outputWrapper;
 		delete fullSystem;
-		if(wrap != 0) wrap->reset();
+		for(IOWrap::Output3DWrapper* ow : wraps) ow->reset();
 		fullSystem = new FullSystem();
 		fullSystem->linearizeOperation=false;
-		fullSystem->outputWrapper = wrap;
+		fullSystem->outputWrapper = wraps;
 	    if(undistorter->photometricUndist != 0)
 	    	fullSystem->setGammaFunction(undistorter->photometricUndist->getG());
 		setting_fullResetRequested=false;
@@ -159,7 +181,7 @@ int main( int argc, char** argv )
 	ros::init(argc, argv, "dso_live");
 
 
-	setlocale(LC_ALL, "");
+
 	for(int i=1; i<argc;i++) parseArgument(argv[i]);
 
 
@@ -188,12 +210,18 @@ int main( int argc, char** argv )
             undistorter->getK().cast<float>());
 
 
+    fullSystem = new FullSystem();
+    fullSystem->linearizeOperation=false;
 
-	fullSystem = new FullSystem();
-	fullSystem->linearizeOperation=false;
-    fullSystem->outputWrapper = new IOWrap::PangolinDSOViewer(
+
+    fullSystem->outputWrapper.push_back(new IOWrap::PangolinDSOViewer(
     		 (int)undistorter->getSize()[0],
-    		 (int)undistorter->getSize()[1]);
+    		 (int)undistorter->getSize()[1]));
+
+
+    if(useSampleOutput)
+        fullSystem->outputWrapper.push_back(new IOWrap::SampleOutputWrapper());
+
 
     if(undistorter->photometricUndist != 0)
     	fullSystem->setGammaFunction(undistorter->photometricUndist->getG());
@@ -202,6 +230,12 @@ int main( int argc, char** argv )
     ros::Subscriber imgSub = nh.subscribe("image", 1, &vidCb);
 
     ros::spin();
+
+    for(IOWrap::Output3DWrapper* ow : fullSystem->outputWrapper)
+    {
+        ow->join();
+        delete ow;
+    }
 
     delete undistorter;
     delete fullSystem;
