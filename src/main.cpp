@@ -79,13 +79,6 @@ void parseArgument(char* arg)
 	}
 
 
-	if(1==sscanf(arg,"option=%d",&option))
-	{
-		benchmarkSpecialOption = option;
-		printf("OPTION %d!!\n",benchmarkSpecialOption);
-		return;
-	}
-
 	if(1==sscanf(arg,"nolog=%d",&option))
 	{
 		if(option==1)
