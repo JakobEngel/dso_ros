@@ -79,7 +79,6 @@ void parseArgument(char* arg)
 	}
 
 
-
 	if(1==sscanf(arg,"nolog=%d",&option))
 	{
 		if(option==1)
@@ -208,9 +207,10 @@ int main( int argc, char** argv )
     fullSystem->linearizeOperation=false;
 
 
-    fullSystem->outputWrapper.push_back(new IOWrap::PangolinDSOViewer(
-    		 (int)undistorter->getSize()[0],
-    		 (int)undistorter->getSize()[1]));
+    if(!disableAllDisplay)
+	    fullSystem->outputWrapper.push_back(new IOWrap::PangolinDSOViewer(
+	    		 (int)undistorter->getSize()[0],
+	    		 (int)undistorter->getSize()[1]));
 
 
     if(useSampleOutput)
