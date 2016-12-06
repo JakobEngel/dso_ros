@@ -24,6 +24,13 @@ find_package(Eigen3 REQUIRED)
 find_package(Boost COMPONENTS system thread)
 find_library(DSO_LIBRARY dso ${DSO_PATH}/build/lib)
 
+catkin_package(
+  CATKIN_DEPENDS
+    geometry_msgs
+    roscpp
+    sensor_msgs
+    cv_bridge
+)
 
 ###########
 ## Build ##
@@ -50,4 +57,3 @@ target_link_libraries(dso_live
     ${Pangolin_LIBRARIES}
     ${OpenCV_LIBS}
     ${catkin_LIBRARIES})
-
