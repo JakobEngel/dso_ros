@@ -173,8 +173,6 @@ void vidCb(const sensor_msgs::ImageConstPtr img)
 int main( int argc, char** argv )
 {
 	ros::init(argc, argv, "dso_live");
-	printf("Hi!\n");
-	std::cerr << "starting" << std::endl;
 
 	for(int i=1; i<argc;i++) parseArgument(argv[i]);
 
@@ -224,8 +222,6 @@ int main( int argc, char** argv )
     ros::NodeHandle nh;
     ros::Subscriber imgSub = nh.subscribe("image", 1, &vidCb);
 
-	std::cout<<"cout"<<std::endl;
-	
     ros::spin();
     fullSystem->printResult("result1.txt");
     for(IOWrap::Output3DWrapper* ow : fullSystem->outputWrapper)
