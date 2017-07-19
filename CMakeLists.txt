@@ -34,7 +34,7 @@ find_library(DSO_LIBRARY dso ${DSO_PATH}/build/lib)
 # SSE flags
 rosbuild_check_for_sse()
 set(CMAKE_CXX_FLAGS
-   "${SSE_FLAGS} -O2 -g -std=c++0x -fno-omit-frame-pointer"
+   "${SSE_FLAGS} -O2 -g -std=c++0x -march=native -fno-omit-frame-pointer"
 )
 
 set(SOURCE_FILES         
