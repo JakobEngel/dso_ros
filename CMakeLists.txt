@@ -37,7 +37,7 @@ catkin_package(
 ###########
 
 set(CMAKE_CXX_FLAGS
-   "${SSE_FLAGS} -O2 -g -std=c++0x -fno-omit-frame-pointer"
+   "${SSE_FLAGS} -O2 -g -std=c++0x -march=native -fno-omit-frame-pointer"
 )
 
 include_directories(
