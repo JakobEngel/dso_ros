@@ -86,8 +86,8 @@ catkin_package(
 ## Build ##
 ###########
 
-set(CMAKE_CXX_FLAGS
-   "${SSE_FLAGS} -O2 -g -std=c++0x -march=native -fno-omit-frame-pointer"
+set(CMAKE_CXX_FLAGS "-std=c++14 -march=native"
+#   "${SSE_FLAGS} -O2 -g -std=c++0x -march=native -fno-omit-frame-pointer"
 )
 
 include_directories(
