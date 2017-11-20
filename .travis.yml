@@ -1,0 +1,67 @@
+dist: trusty
+sudo: enabled
+language: cpp
+cache: ccache
+
+compiler:
+  - gcc
+env:
+  global:
+    - ROS_DISTRO=indigo
+  matrix:
+    - BUILD_TYPE=Release
+    - BUILD_TYPE=Debug
+
+# get c++14 compatible gcc version
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-5
+      - g++-5
+
+before_install:
+  - CC=gcc-5 && CXX=g++-5
+  - export CI_SOURCE_PATH=$(pwd)
+  - export REPOSITORY_NAME=${PWD##*/}
+  - echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
+  - sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list'
+  - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq -y python-catkin-pkg python-rosdep python-wstool ros-$ROS_DISTRO-catkin ros-$ROS_DISTRO-ros python-rosinstall python-catkin-tools
+  # Setup rosdep
+  - sudo rosdep init
+  - rosdep update
+
+install:
+  # Create workspace
+  - mkdir -p ~/ros/ws_$REPOSITORY_NAME
+  - cd ~/ros/ws_$REPOSITORY_NAME
+  - catkin config --init --mkdirs
+  - cd src
+  # Clone dependencies
+  # FXIME: get upstream branches after PRs are merged
+  - git clone -b cmake https://github.com/NikolausDemmel/dso
+  # Link the repo we are testing to the new workspace
+  - ln -s $CI_SOURCE_PATH .
+  # Install DSO dependencies (not handled by rosdep)
+  - cd dso
+  - scripts/ci-install-linux-deps.sh
+  # Install additional dependencies for source repos with rosdep
+  - cd ~/ros/ws_$REPOSITORY_NAME
+  - rosdep install -r -n --from-paths src --ignore-src --rosdistro $ROS_DISTRO -y
+
+before_script:
+  - source /opt/ros/$ROS_DISTRO/setup.bash
+  - rospack profile
+
+script:
+  - cd ~/ros/ws_$REPOSITORY_NAME
+  - catkin config -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+  - catkin build -j4 --verbose --summary --no-status
+  #- catkin run_tests -p1 -j4 --summary
+  #- catkin_test_results --all ~/ros/ws_$REPOSITORY_NAME/build
+
+#after_failure:
+#  - find ~/ros/ws_$REPOSITORY_NAME/build -path '*/test_results/*' -type f -exec echo "==== {} ====" \; -exec cat {} \;
