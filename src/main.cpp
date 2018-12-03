@@ -49,6 +49,7 @@
 std::string calib = "";
 std::string vignetteFile = "";
 std::string gammaFile = "";
+std::string saveFile = "";
 bool useSampleOutput=false;
 
 using namespace dso;
@@ -57,6 +58,12 @@ void parseArgument(char* arg)
 {
 	int option;
 	char buf[1000];
+	if(1==sscanf(arg,"savefile=%s",buf))
+	{
+		saveFile = buf;
+		printf("saving to %s on finish!\n", saveFile.c_str());
+		return;
+	}
 
 	if(1==sscanf(arg,"sampleoutput=%d",&option))
 	{
@@ -159,6 +166,7 @@ void vidCb(const sensor_msgs::ImageConstPtr img)
 
 	MinimalImageB minImg((int)cv_ptr->image.cols, (int)cv_ptr->image.rows,(unsigned char*)cv_ptr->image.data);
 	ImageAndExposure* undistImg = undistorter->undistort<unsigned char>(&minImg, 1,0, 1.0f);
+	undistImg->timestamp=img->header.stamp.toSec(); // relay the timestamp to dso
 	fullSystem->addActiveFrame(undistImg, frameID);
 	frameID++;
 	delete undistImg;
@@ -224,7 +232,7 @@ int main( int argc, char** argv )
     ros::Subscriber imgSub = nh.subscribe("image", 1, &vidCb);
 
     ros::spin();
-
+    fullSystem->printResult(saveFile); 
     for(IOWrap::Output3DWrapper* ow : fullSystem->outputWrapper)
     {
         ow->join();
