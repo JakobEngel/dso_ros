@@ -51,6 +51,6 @@ include_directories(
 )  
 
 rosbuild_add_executable(dso_live src/main.cpp ${SOURCE_FILES})
-target_link_libraries(dso_live ${DSO_LIBRARY} ${Pangolin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(dso_live ${DSO_LIBRARY} ${Pangolin_LIBRARIES} ${OpenCV_LIBS} ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 rosbuild_link_boost(dso_live thread)
 
